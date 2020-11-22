@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html data-n-head="">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta data-n-head="true" name="viewport" content="width=device-width, initial-scale=1">
+    <meta data-n-head="true" renderer="webkit">
+    <meta data-n-head="true" name="format-detection" content="telephone=no">
+    <meta data-n-head="true" http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta data-n-head="true" data-hid="description" name="description" content="">
+    <meta data-n-head="true" data-hid="keywords" name="keywords" content="">
+    <title data-n-head="true">区块浏览器 | QKI</title>
+    <link data-n-head="true" rel="icon" type="image/x-icon" href="">
+
+    <link data-n-head="true" rel="stylesheet" type="text/css" charset="utf-8" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/block_browser.css?v=1">
+    <link rel="stylesheet" href="../../css/jquery-confirm.css" />
+    <link rel="stylesheet" href="fonts/iconfont.css" />
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jquery-confirm.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<div class="vheader">
+    <div class="vcontainer vheader-inner">
+        <a href="./index.html" class="icon iconfont icon-icon-test1 news_logo"></a>
+        <ul class="nav d-lg-block d-none">
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item">
+                <a href="./index.html">首页</a>
+            </li>
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item">
+                <a href="./block.html">区块</a>
+            </li>
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item">
+                <a href="../index.html">钱包</a>
+            </li>
+        </ul>
+        <div class="search-container d-lg-block d-none">
+            <div class="vsearch-panel" data-v-2f615f5c="">
+                <div class="vsearch" data-v-2f615f5c="">
+                    <div class="vsearch-inner" data-v-2f615f5c="">
+                        <div class="search-bar" data-v-2f615f5c="">
+                            <input placeholder="交易Hash" value="" class="input-search" id="pc-search-input" data-v-2f615f5c="">
+                            <i class="btn-search search-btn"  data-v-2f615f5c=""></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="placeholder" data-v-2f615f5c=""></div>
+            </div>
+        </div>
+        <div class="mobile-menu d-block d-lg-none">
+            <button type="button" aria-label="Toggle navigation" aria-controls="nav_search" aria-expanded="false" id="button_nav_search" class="nav-toggle navbar-toggler">
+                <span class="icon-button icon-search"></span>
+            </button>
+            <button type="button" aria-label="Toggle navigation" aria-controls="nav_menu" aria-expanded="false" id="button_nav_menu" class="nav-toggle navbar-toggler">
+                <span class="icon-button icon-hamburger"></span>
+            </button>
+        </div>
+    </div>
+    <div id="nav_search" class="navbar-collapse collapse" style="">
+        <ul class="navbar-nav">
+            <div class="mobile-search-container">
+                <div class="vsearch-panel" data-v-2f615f5c="">
+                    <div class="vsearch" data-v-2f615f5c="">
+                        <div class="vsearch-inner" data-v-2f615f5c="">
+                            <div class="search-bar" data-v-2f615f5c="">
+                                <input placeholder="交易Hash" value="" class="input-search" id="web-search-input" data-v-2f615f5c=""><i class="btn-search search-btn" data-v-2f615f5c=""></i></div></div></div><div class="placeholder" data-v-2f615f5c="">
+                </div>
+                </div>
+            </div>
+        </ul>
+    </div>
+
+    <div id="nav_menu" class="navbar-collapse collapse" style="display: none;"><div class="menu-container">
+        <ul class="navbar-nav nav-links">
+            <li class="nav-item current">
+                <a href="./index.html" class="nav-link">首页
+                </a>
+            </li>
+            <li class="nav-item">
+                <a rel="noopener" href="./block.html"  class="nav-link">区块</a>
+            </li>
+            <li class="nav-item">
+                <a rel="noopener" href="../index.html"  class="nav-link">钱包</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</div>
+
+<div class="vcontainer page" id="content">
+
+    <div data-v-0c97b89a="" class="header d-block d-lg-flex">
+        <span data-v-0c97b89a="" class="name">交易（Hash）</span>
+        <span data-v-0c97b89a="" class="hash d-block d-lg-inline-block">{{hash.hash}}</span></div>
+    <div data-v-0c97b89a="" class="base">
+        <p data-v-0c97b89a="" class="title mobile-padding">基本信息</p>
+        <div data-v-0c97b89a="" class="d-block d-lg-flex vshadow">
+            <ul data-v-0c97b89a="" class="vsection base-left">
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">高度</span>
+                    <div data-v-0c97b89a="">
+                        <a data-v-0c97b89a="" href="javascript:void(0);" v-on:tap="blockInfo(hash.block_hash)" class="vcolor-52cbca">{{hash.block_number}}</a>
+                    </div>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">使用gas</span>
+                    <span data-v-0c97b89a="" id="hash-time" class="text2" data-original-title="" title="">{{hash.gas}}</span>
+
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">数量</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="" style="padding-left: 170px;">{{hash.value}} QKI</span>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">矿工费</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="" style="padding-left: 170px;">{{hash.fee}} QKI</span>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">input</span>
+                    <button type="button" onclick="javascript:convertstr2();" class="mui-btn mui-btn-outlined hex2utf8">转换</button>
+                    <textarea id="inputdata" class="form-control" rows="1" readonly="" style="width: 65%; min-width: 278px; max-width: 324px">{{hash.input}}</textarea>
+                </li>
+
+            </ul>
+            <ul data-v-0c97b89a="" class="vsection base-right">
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">来源</span>
+                    <span data-v-0c97b89a="" class="text2"><a data-v-0c97b89a="" href="javascript:void(0);" v-on:tap="addressInfo(hash.from)" class="hash font-hash-content">{{hash.from}}</a></span></li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">接收</span>
+                    <span data-v-0c97b89a="" class="text2"><a data-v-0c97b89a="" href="javascript:void(0);" v-on:tap="addressInfo(hash.to)" class="hash font-hash-content">{{hash.to}}</a></span></li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">gas价格</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="">{{hash.gasPrice}} QKI</span>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">交易数量(nonce)</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" id="transaction_count"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div data-v-0c97b89a="" class="base" v-if="token_data != ''">
+        <p data-v-0c97b89a="" class="title mobile-padding">通证交易</p>
+        <div data-v-0c97b89a="" class="d-block d-lg-flex vshadow">
+            <ul data-v-0c97b89a="" class="vsection base-left">
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">数量</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="" style="padding-left: 170px;">{{token_data.amount}}</span>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">来源</span>
+                    <span data-v-0c97b89a="" class="text2"><a data-v-0c97b89a="" href="javascript:void(0);" v-on:tap="addressInfo(hash.from)" class="hash font-hash-content">{{hash.from}}</a></span></li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">接收</span>
+                    <span data-v-0c97b89a="" class="text2"><a data-v-0c97b89a=""  href="javascript:void(0);" v-on:tap="addressInfo(token_data.payee)" class="hash font-hash-content">{{token_data.payee}}</a></span></li>
+
+            </ul>
+            <ul data-v-0c97b89a="" class="vsection base-right">
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">通证名称</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="" style="padding-left: 170px;">{{unit}}</span>
+                </li>
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">通证符号</span>
+                    <span data-v-0c97b89a="" class="text2" data-original-title="" title="" style="padding-left: 170px;">{{unit}}</span>
+                </li>
+
+                <li data-v-0c97b89a="" class="item">
+                    <span data-v-0c97b89a="" class="text2 strong">合约地址</span>
+                    <span data-v-0c97b89a="" class="text2"><a data-v-0c97b89a="" href="javascript:void(0);" v-on:tap="addressInfo(hash.to)" class="hash font-hash-content">{{hash.to}}</a></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="vfooter">
+
+    <p class="panel-bottom">Copyright ©2018 quarkblockchain v1.0</p>
+</div>
+
+<div id="btn_top" class="cmp-navtop d-none d-lg-flex" style="display:none;" data-v-59831c6c="">
+    <span class="arrow" data-v-59831c6c=""></span>
+    <span class="text" data-v-59831c6c="">TOP</span>
+</div>
+</div>
+
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/app.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/h.min.js"></script>
+<script src="../../js/math.min.js"></script>
+<script src="../../js/web3.min.js"></script>
+<script src="../../js/ethers-v4.min.js" charset="utf-8"  type="text/javascript"></script>
+<script type="text/javascript">
+    // 引入web3
+    var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    var units = web3.utils.toWei('1');
+
+    $('#btn_top').click(function () {
+        $('html,body').animate({ scrollTop: 0 }, 500);
+    });
+    var show = true;
+    $('#button_nav_search').bind('click',function(){
+        if(!$("#nav_search").is(":animated")){
+            if(show==true){
+
+                $("#nav_search").slideDown("slow");
+                show=false;
+            }else if(show==false){
+
+                $("#nav_search").slideUp("slow");
+                show=true;
+            }
+        }
+    });
+    var show_nav = true;
+    $('#button_nav_menu').bind('click',function(){
+        if(!$("#nav_menu").is(":animated")){
+            if(show_nav==true){
+
+                $("#nav_menu").slideDown("slow");
+                show_nav=false;
+            }else if(show_nav==false){
+
+                $("#nav_menu").slideUp("slow");
+                show_nav=true;
+            }
+        }
+    });
+    vm = new Vue({
+        el: '#content',
+        data: {
+            hash:[],
+            token_data: [],
+            unit: '',
+            deci:units,
+        },
+        methods :{
+            blockInfo: function (hash) {
+                window.location.href = './block_detail.html#'+hash;
+            },
+            addressInfo: function (address) {
+                window.location.href = './address.html#'+address;
+            },
+        }
+    });
+
+    //获取详情
+    getTxInfo();
+    function getTxInfo()
+    {
+        var hash = getUrlAttr();
+        if(hash)
+        {
+            rpc('eth_getTransactionByHash',[hash],function (data) {
+                if(data.result)
+                {
+                    var tx = {};
+                    var item = data.result;
+                    tx.hash = item.hash;
+                    tx.block_hash = item.blockHash;
+                    tx.from = item.from;
+                    tx.to = item.to;
+                    tx.input = item.input;
+                    tx.block_number = web3.utils.hexToNumberString(item.blockNumber);
+                    tx.value = web3.utils.fromWei(web3.utils.hexToNumberString(item.value));
+                    var gasPrice = web3.utils.fromWei(web3.utils.hexToNumberString(item.gasPrice));
+                    tx.num = gasPrice;
+                    //交易数量
+                    getTransactionCount(item.from);
+                    //通证数据处理
+                    var input = item.input;
+                    var flag = input.substr(0, 10);
+                    if(flag === '0xa9059cbb')
+                    {
+                        var token_data = {};
+                        var payee  = input.substr(34, 40);
+                        var amount = input.substr(120);
+                        token_data.payee  = '0x'+payee;
+
+                        // abi json 对象
+                        const abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" } ];
+                        // 创建一个连接主网络的 provider
+                        const provider = new ethers.providers.JsonRpcProvider({"url":"http://localhost:8545"});
+                        // 创建智能合约
+                        const contract = new ethers.Contract(item.to, abi, provider);
+                        contract.symbol().then(function (unit) {
+                            vm.unit = unit;
+                        });
+                        var decimals = 0;
+                        contract.decimals().then(function(data) {
+                            decimals = data;
+                            vm.deci = math.pow(10,decimals);
+                            token_data.amount = web3.utils.hexToNumber(amount)/math.pow(10,decimals);
+                            vm.token_data = token_data;
+                        });
+                    }
+
+                    rpc('eth_getTransactionReceipt',[hash],function (result) {
+                        var data_tr = result.result;
+                        tx.gas = web3.utils.hexToNumberString(data_tr.gasUsed);
+                        tx.fee = web3.utils.fromWei(""+math.multiply(web3.utils.hexToNumber(data_tr.gasUsed) , item.gasPrice));
+                        tx.gasPrice = gasPrice;
+                        vm.hash = tx;
+                    })
+                }else{
+                    return false;
+                }
+            });
+
+        }else{
+            return false;
+        }
+    }
+
+    function editE (num) {
+        var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/);
+        return num.toFixed(Math.max(0, (m[1] || '').length - m[2]));
+    }
+
+
+    $(".search-btn").click(function () {
+        search();
+    });
+
+    $(".input-search").keypress(function(e) {
+        // 回车键事件
+        if(e.which == 13) {
+            search();
+        }
+    });
+
+
+    function search() {
+        var keyword;
+        if($('#pc-search-input').val() != '')
+        {
+            keyword = $('#pc-search-input').val();
+        }else{
+            keyword = $('#web-search-input').val();
+        }
+        if(!keyword){
+            $.alert({
+                type: 'red',
+                title: '系统提示',
+                content: '请输入"交易Hash"',
+            });
+            return false;
+        }
+
+        window.location.href = './transactions.html#'+keyword;
+    }
+
+    //获取地址交易数量
+    function getTransactionCount(my_address)
+    {
+        web3.eth.getTransactionCount(my_address).then(function (data) {
+            $("#transaction_count").html(data);
+        })
+    }
+
+    function hex2utf8(pStr) {
+        var tempstr = ''
+        try {
+            tempstr = decodeURIComponent(pStr.replace(/\s+/g, '').replace(/[0-9a-f]{2}/g, '%$&'));
+        } catch (err) {
+            tempstr = hex2asc(pStr);
+        }
+        return tempstr;
+    }
+    function hex2asc(pStr) {
+        tempstr = '';
+        for (b = 0; b < pStr.length; b = b + 2) {
+            tempstr = tempstr + String.fromCharCode(parseInt(pStr.substr(b, 2), 16));
+        }
+        return tempstr;
+    }
+
+    is_utf8 = false;
+    hex_input = "";
+    function convertstr2() {
+        if(is_utf8)
+        {
+            document.getElementById('inputdata').innerHTML = hex_input;
+            is_utf8 = !is_utf8;
+        }
+        else
+        {
+            if(hex_input == "")
+            {
+                hex_input = document.getElementById('inputdata').innerHTML;
+            }
+            document.getElementById('inputdata').innerHTML = hex2utf8(hex_input);
+            is_utf8 = !is_utf8;
+        }
+
+    }
+</script>
+</body>
+
+</html>

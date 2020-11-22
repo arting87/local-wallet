@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html data-n-head="">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta data-n-head="true" name="viewport" content="width=device-width, initial-scale=1">
+    <meta data-n-head="true" renderer="webkit">
+    <meta data-n-head="true" name="format-detection" content="telephone=no">
+    <meta data-n-head="true" http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta data-n-head="true" data-hid="description" name="description" content="">
+    <meta data-n-head="true" data-hid="keywords" name="keywords" content="">
+    <title data-n-head="true">区块浏览器 | QKI</title>
+    <link data-n-head="true" rel="icon" type="image/x-icon" href="">
+
+    <link data-n-head="true" rel="stylesheet" type="text/css" charset="utf-8" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/block_browser.css?v=1">
+    <link rel="stylesheet" href="../../css/jquery-confirm.css" />
+    <link rel="stylesheet" href="fonts/iconfont.css" />
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jquery-confirm.min.js"></script>
+    <script src="../../js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+<div class="vheader">
+    <div class="vcontainer vheader-inner">
+        <a href="./index.html" class="icon iconfont icon-icon-test1 news_logo"></a>
+        <ul class="nav d-lg-block d-none">
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item current">
+                <a href="./index.html">首页</a>
+            </li>
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item">
+                <a href="./block.html">区块</a>
+            </li>
+            <li class="nuxt-link-exact-active nuxt-link-active nav-item">
+                <a href="../index.html">钱包</a>
+            </li>
+        </ul>
+        <div class="search-container d-lg-block d-none">
+            <div class="vsearch-panel" data-v-2f615f5c="">
+                <div class="vsearch" data-v-2f615f5c="">
+                    <div class="vsearch-inner" data-v-2f615f5c="">
+                        <div class="search-bar" data-v-2f615f5c="">
+                            <input placeholder="区块Hash" value="" class="input-search" id="pc-search-input" data-v-2f615f5c="">
+                            <i class="btn-search search-btn"  data-v-2f615f5c=""></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="placeholder" data-v-2f615f5c=""></div>
+            </div>
+        </div>
+        <div class="mobile-menu d-block d-lg-none">
+            <button type="button" aria-label="Toggle navigation" aria-controls="nav_search" aria-expanded="false" id="button_nav_search" class="nav-toggle navbar-toggler">
+                <span class="icon-button icon-search"></span>
+            </button>
+            <button type="button" aria-label="Toggle navigation" aria-controls="nav_menu" aria-expanded="false" id="button_nav_menu" class="nav-toggle navbar-toggler">
+                <span class="icon-button icon-hamburger"></span>
+            </button>
+        </div>
+    </div>
+    <div id="nav_search" class="navbar-collapse collapse" style="">
+        <ul class="navbar-nav">
+            <div class="mobile-search-container">
+                <div class="vsearch-panel" data-v-2f615f5c="">
+                    <div class="vsearch" data-v-2f615f5c="">
+                        <div class="vsearch-inner" data-v-2f615f5c="">
+                            <div class="search-bar" data-v-2f615f5c="">
+                                <input placeholder="区块Hash" value="" class="input-search" id="web-search-input" data-v-2f615f5c=""><i class="btn-search search-btn" data-v-2f615f5c=""></i></div></div></div><div class="placeholder" data-v-2f615f5c="">
+                </div>
+                </div>
+            </div>
+        </ul>
+    </div>
+
+    <div id="nav_menu" class="navbar-collapse collapse" style="display: none;"><div class="menu-container">
+        <ul class="navbar-nav nav-links">
+            <li class="nav-item current">
+                <a href="./index.html" class="nav-link">首页
+                </a>
+            </li>
+            <li class="nav-item">
+                <a rel="noopener" href="./block.html"  class="nav-link">区块</a>
+            </li>
+            <li class="nav-item">
+                <a rel="noopener" href="../index.html"  class="nav-link">钱包</a>
+            </li>
+        </ul>
+    </div>
+    </div>
+</div>
+
+<div class="page">
+    <div class="vcontainer" id="content">
+        <div class="panel-block">
+            <div class="clearfix panel-header">
+                <span class="float-left">最近出块</span>
+                <a href="./block.html" class="float-right">查看更多</a></div>
+            <div>
+            <table aria-busy="false" aria-colcount="4" class="vtable vshadow table b-table">
+                <thead class="">
+                <tr>
+                    <th aria-colindex="1" class="">区块高度</th>
+                    <th aria-colindex="2" class="time-label" style="text-align: center;">出块时间</th>
+                    <th aria-colindex="3" class="">交易数量</th>
+                    <th aria-colindex="4" class="pc-hash">大小(KB)</th>
+                    <th aria-colindex="5" class="pc-hash">难度</th>
+                    <th aria-colindex="6" class="">出块方</th>
+                    <th aria-colindex="7" class="">区块Hash</th></tr>
+                </thead>
+                <!---->
+                <tbody class="">
+                <tr class="" v-for="item in list" v-cloak>
+                    <td aria-colindex="1" class="">
+                        <a href="javascript:void(0);" v-on:tap="blockInfo(item.hash)" class="text3">{{item.block_height}}</a>
+                    <td aria-colindex="2" class="">
+                        <span class="block-time" style="text-align: center;">{{item.created_at}}</span>
+                    </td>
+                    <td aria-colindex="3" class="">{{item.tx_count}}</td>
+                    <td aria-colindex="4" class="pc-hash">{{item.size}}</td>
+                    <td aria-colindex="5" class="pc-hash">{{item.difficulty}}</td>
+                    <td aria-colindex="6" class="pc-hash">
+                        <a href="javascript:void(0);" v-on:tap="addressInfo(item.miner)" class="text3 vtext-monospace">{{item.miner}}</a>
+                    </td>
+                    <td aria-colindex="7" class="pc-hash">
+                        <a href="javascript:void(0);" v-on:tap="blockInfo(item.hash)" class="text3 vtext-monospace">{{item.hash}}</a>
+                    </td>
+                    <td aria-colindex="6" class="web-hash">
+                        <a href="javascript:void(0);" v-on:tap="addressInfo(item.miner)" class="text3 vtext-monospace">{{item.miner.substr(0,5)}}</a>
+                    </td>
+                    <td aria-colindex="7" class="web-hash">
+                        <a href="javascript:void(0);" v-on:tap="blockInfo(item.hash)" class="text3 vtext-monospace">{{item.hash.substr(0,5)}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="vfooter">
+
+    <p class="panel-bottom">Copyright ©2018 quarkblockchain v1.0</p>
+</div>
+
+<div id="btn_top" class="cmp-navtop d-none d-lg-flex" style="display:none;" data-v-59831c6c="">
+    <span class="arrow" data-v-59831c6c=""></span>
+    <span class="text" data-v-59831c6c="">TOP</span>
+</div>
+</div>
+
+<script src="../../js/mui.min.js"></script>
+<script src="../../js/app.js?v=3"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/h.min.js"></script>
+<script src="../../js/web3.min.js"></script>
+<script type="text/javascript">
+    // 引入web3
+    var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+    $('#btn_top').click(function () {
+        $('html,body').animate({ scrollTop: 0 }, 500);
+    });
+    var show = true;
+    $('#button_nav_search').bind('click',function(){
+        if(!$("#nav_search").is(":animated")){
+            if(show==true){
+
+                $("#nav_search").slideDown("slow");
+                show=false;
+            }else if(show==false){
+
+                $("#nav_search").slideUp("slow");
+                show=true;
+            }
+        }
+    });
+    var show_nav = true;
+    $('#button_nav_menu').bind('click',function(){
+        if(!$("#nav_menu").is(":animated")){
+            if(show_nav==true){
+
+                $("#nav_menu").slideDown("slow");
+                show_nav=false;
+            }else if(show_nav==false){
+
+                $("#nav_menu").slideUp("slow");
+                show_nav=true;
+            }
+        }
+    });
+    vm = new Vue({
+        el: '#content',
+        data: {
+            list:[],
+        },
+        methods :{
+            blockInfo: function (hash) {
+                window.location.href = './block_detail.html#'+hash;
+            },
+            addressInfo: function (address) {
+                window.location.href = './address.html#'+address;
+            }
+        }
+    });
+    getBlockList();
+    function getBlockList() {
+        rpc('eth_getBlockByNumber',['latest',true],function (data) {
+            if(data.result)
+            {
+                var last_block_number = web3.utils.hexToNumber(data.result.number);
+                var block_string = '';
+                for(var i=0;i<20;i++)
+                {
+                    if(last_block_number < 0)
+                    {
+                        break;
+                    }
+                    var id = Math.round(Math.random()*100);
+                    var num=parseInt(last_block_number--);
+                    var oxNum=num.toString(16);
+                    block_string += '{"jsonrpc":"2.0","method":"eth_getBlockByNumber","params":["0x'+oxNum+'", true],"id":'+id+'},';
+                }
+                block_string = '['+block_string.substring(0,block_string.length-1)+']';
+                mui.ajax(host,{
+                    contentType: 'application/json;charset=UTF-8',
+                    data:block_string,
+                    dataType:'json',//服务器返回json格式数据
+                    type:'post',//HTTP请求类型
+                    timeout:10000,//超时时间设置为10秒；
+                    success:function(data){
+                        if(data.length > 1)
+                        {
+                            var block = [];
+                            $.each(data,function (i,item) {
+                                block[i] = item.result;
+                                block[i].block_height = web3.utils.hexToNumber(block[i].number);
+                                block[i].created_at = timestampToTime(parseInt(block[i].timestamp,16));
+                                block[i].tx_count = block[i].transactions.length;
+                                block[i].size = web3.utils.hexToNumber(block[i].size)/1000;
+                                block[i].difficulty = web3.utils.hexToNumber(block[i].difficulty);
+                            });
+                            vm.list = block;
+                        }
+                    },
+                    error:function(xhr,type,errorThrown){
+
+                        mui.toast("网络错误");
+                    }
+                });
+            }else{
+                return true;
+            }
+        });
+    }
+    setInterval(getBlockList, 5000);
+
+    $(".search-btn").click(function () {
+        search();
+    });
+
+    $(".input-search").keypress(function(e) {
+        // 回车键事件
+        if(e.which == 13) {
+            search();
+        }
+    });
+
+
+    function search() {
+        var keyword;
+        if($('#pc-search-input').val() != '')
+        {
+            keyword = $('#pc-search-input').val();
+        }else{
+            keyword = $('#web-search-input').val();
+        }
+        if(!keyword){
+            $.alert({
+                type: 'red',
+                title: '系统提示',
+                content: '请输入"区块Hash"',
+            });
+            return false;
+        }
+
+        window.location.href = './block_detail.html#'+keyword;
+    }
+
+    sw_version = "V5";
+    update_sw(sw_version);
+</script>
+</body>
+
+</html>

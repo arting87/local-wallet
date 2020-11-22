@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>QKI钱包-转账</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link href="../../css/app.css?v=1" rel="stylesheet"/>
+    <link href="../../fonts/iconfont.css" rel="stylesheet"/>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav app-header-2" id="header" >
+		<a class="mui-icon mui-pull-left icon iconfont icon-back" id="back-btn"></a>
+		<h1 class="mui-title">账户</h1>
+	</header>
+	
+	<div class="mui-content" id="content" v-cloak>
+		
+		<div class="account-balance-box">
+			<div class="item" id="update-name">
+				<p class="title">昵称(点击修改)</p>
+				<p class="value balance">{{wallet_name[address]}}</p>
+			</div>
+			<div class="item">
+				<p class="title">余额</p>
+				<p class="value balance"><v-countup :start-value="startAmount" :end-value="endAmount" decimals="8" duration="2"></v-countup> <i>QKI</i></p>
+			</div>
+			<div class="item">
+				<p class="title">地址</p>
+				<button class="value address-copy-btn" id="address-copy-btn" data-clipboard-text="">{{address}}</button>
+			</div>
+		</div>
+		<div class="account-balance-bg">
+			<img src="../../images/account-balanace-bg.png" alt="">
+		</div>
+
+		<ul class="mui-table-view mui-grid-view mui-grid-9 account-menu">
+	 		<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="export-btn">
+					<img src="../../images/export-ico.png" alt="">
+					<div class="mui-media-body">转出</div>
+			</li>
+
+			<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="add-export-btn">
+				<img src="../../images/export-ico.png" alt="">
+				<div class="mui-media-body">添加通证</div>
+			</li>
+
+			<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="unlock-btn">
+				<img src="../../images/export-ico.png" alt="">
+				<div class="mui-media-body">解锁钱包</div>
+			</li>
+		</ul>
+		<div class="balance-div bb" v-for="(item, key) in token" style="overflow: hidden">
+			<p class="p-for-input" v-on:tap="open_pass(key)">通证：{{key}}</p>
+			<h3 class="balance-h mui-pull-left" v-on:tap="open_pass(key)">{{amount[key]}}<span class="unit"> {{unit[key]}}</span></h3>
+			<button class="mui-btn-danger mui-pull-right" v-on:tap="del(key)">删除</button>
+		</div>
+
+		<!--升级弹窗-->
+		<div id="add-account-popover" class="mui-popover add-account-popover">
+			<div class="popover-box">
+				<div class="title">
+					<img src="../images/add-account-ico.png" alt="">
+					<p>修改用户名</p>
+				</div>
+				<div class="pop-upgrate-content">
+					<input type="text" name="name" id="name" :value="wallet_name[address]" placeholder="请输入昵称">
+				</div>
+
+				<div class="pop-upgrate-btn">
+					<button class="default-btn btn-purple" data-loading-text="添加中..." data-loading-icon id="update-name-btn">提交修改</button>
+				</div>
+				<img id="cancel" class="close-popover-img close-add-power-pop" src="../../images/close-popover.png" />
+			</div>
+		</div>
+	</div>
+	
+	<script src="../../js/mui.min.js"></script>
+	<script src="../../js/immersed.1.js"></script>
+	<script src="../../js/h.min.js"></script>
+    <script src="../../js/app.js"></script>
+    <script src="../../js/vue.js"></script>
+    <script src="../../js/error.js"></script>
+    <script src="../../js/clipboard.min.js"></script>
+	<script src="../../js/vue-countup.min.js"></script>
+	<script src="../../js/math.min.js"></script>
+	<script src="../../js/ethers-v4.min.js" charset="utf-8"  type="text/javascript"></script>
+	<script src="../../js/web3.min.js"></script>
+	<script type="text/javascript" charset="utf-8">
+        if(localStorage.getItem('token_address')==null || localStorage.getItem('token_address')=="undefined"){
+
+            var obj = {};
+
+            obj['0x4175aa5d372015b67ef58514414086f0f36caa7a']="1";
+
+            localStorage.setItem('token_address',JSON.stringify(obj));
+        }
+
+
+		mui.init();
+		var address = GetQueryString('address');
+		vm = new Vue({
+			el: '#content',
+			data: {
+				address:address,
+				startAmount: 0,
+				endAmount: 0,
+                amount:{},
+                unit:{},
+				token:{},
+                wallet_name:{}
+			},
+            methods :{
+                open_pass : function(token){
+					mui.openWindow({
+						id: 'export.html',
+						url: 'token_export.html?token='+token+'&address='+address,
+						show: {
+							autoShow:true,
+						},
+						waiting: {
+							autoShow: false
+						}
+					});
+            },
+			del:function(token){
+                var btnArray = ['否', '是'];
+                mui.confirm('确认删除？', '提示', btnArray, function(e) {
+                    if (e.index == 1) {
+
+						Vue.delete(vm.token,token);
+					var new_token = JSON.parse(localStorage.getItem('token_address'));
+                        delete new_token[token];
+
+                        localStorage.setItem('token_address',JSON.stringify(new_token));
+                    }
+                })
+			}
+        },
+		});
+        var token_address = JSON.parse(localStorage.getItem('token_address'));
+		
+		vm.token = token_address;
+
+        for(var i in token_address) {
+
+            createSmartContract(i, address);
+
+        }
+
+
+        h("#address-copy-btn").tap(function(){
+			h("#address-copy-btn").attr("data-clipboard-text",address);
+			clipboard = new Clipboard('.address-copy-btn');
+		    clipboard.on('success', function(e) {
+		        mui.toast('复制成功');
+		        e.clearSelection();
+		    });
+		});
+
+		//qki
+		h("#export-btn").tap(function(){
+			mui.openWindow({
+				id: 'export.html',
+				url: 'export.html?address='+address,
+				show: {
+					autoShow:true,
+				},
+				waiting: {
+					autoShow: false
+				}
+			});
+		});
+        //qki
+        h("#add-export-btn").tap(function(){
+            mui.openWindow({
+                id: 'add-export.html',
+                url: 'add-export.html?address='+address,
+                show: {
+                    autoShow:true,
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+        });
+        //qki
+        h("#unlock-btn").tap(function(){
+			var btnArray = ['取消', '解锁'];
+			mui.prompt('请输入密码,解锁钱包30秒，请勿在不安全的环境解锁','输入密码',"解锁钱包",btnArray,function(e){
+				if(e.index == 1){
+					rpc("personal_unlockAccount", [address, e.value, 30],function () {
+						if(data.result)
+						{
+							mui.toast("解锁成功");
+						}
+						else{
+						if(data.error.code == -32000)
+						{
+							mui.toast("账户异常");
+						}else{
+							mui.toast("网络异常");
+						}
+					}
+					})
+				}else{
+					mui.toast('您取消了解锁');
+				}
+			});
+        });
+
+
+		updateAccount();
+		/**
+		 * 请求当前账户的余额
+		 */
+		function updateAccount()
+		{
+            // 引入web3
+            var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+             rpc("eth_getBalance",[address, "latest"],function (data) {
+				vm.endAmount =  web3.utils.fromWei(web3.utils.hexToNumberString(data.result));
+            });
+            var wallet_name = localStorage.getItem("wallet_name");
+            vm.wallet_name = JSON.parse(wallet_name);
+			if(vm.wallet_name == null)
+				vm.wallet_name = {};
+		}
+
+		h("#back-btn").tap(function(){
+			mui.openWindow({
+				id: 'index.html',
+				url: '../index.html',
+				show: {
+					autoShow:true,
+				},
+				waiting: {
+					autoShow: false
+				}
+			});
+		});
+        /**
+         * 查询智能合约余额
+         * @param address 转出地址
+         */
+        function createSmartContract(token, address) {
+            // abi json 对象
+            const abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" } ];
+            // 创建一个连接主网络的 provider
+            const provider = new ethers.providers.JsonRpcProvider({"url":"http://localhost:8545"});
+            // 创建智能合约
+            const contract = new ethers.Contract(token, abi, provider);
+
+
+            var decimals = 0;
+            contract.decimals().then(function(data){
+                decimals = data;
+
+                var balance =  0;
+                contract.balanceOf(address).then(function (data) {
+                    balance = math.divide(data.toString(), math.pow(10,decimals));
+
+                    contract.symbol().then(function (unit) {
+                        Vue.set(vm.unit, token, unit);
+                        Vue.set(vm.amount, token, balance);
+
+
+                    })
+
+                })
+            })
+
+
+        }
+
+        //弹窗js
+        document.getElementById('update-name').addEventListener('tap',function(){
+            mui('#add-account-popover').popover('show',document.getElementById("location-div"));
+        });
+        document.getElementById('cancel').addEventListener('tap',function(){
+            mui('#add-account-popover').popover('hide');
+        });
+        h("#update-name-btn").tap(function(){
+            updateName();
+        });
+        /**
+         * 修改用户名
+         */
+        function updateName()
+        {
+            var name = h("#name").val();
+            var wallet_name = localStorage.getItem("wallet_name");
+            if(wallet_name==null){
+                var wallet_name = {};
+                wallet_name[vm.address] = name;
+            }else{
+                wallet_name = JSON.parse(wallet_name);
+                wallet_name[vm.address] = name;
+            }
+            vm.wallet_name = wallet_name;
+            var str = JSON.stringify(wallet_name);
+            localStorage.setItem("wallet_name",str);
+            mui('#add-account-popover').popover('hide');
+            mui.toast('修改成功')
+        }
+	</script>
+</body>
+</html>

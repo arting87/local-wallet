@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link href="../../css/app.css" rel="stylesheet"/>
+    <link href="../../fonts/iconfont.css" rel="stylesheet"/>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav app-header-2" id="header">
+		<a class="mui-action-back mui-icon mui-pull-left icon iconfont icon-back"></a>
+		<h1 class="mui-title">添加通证</h1>
+	</header>
+	
+	<div class="mui-content">
+		<div class="input-div bb">
+			<p class="p-for-input">通证token</p>
+			<div class="mui-input-row">
+				<input type="text" placeholder="请输入地址" id="token_address">
+
+			</div>
+		</div>
+
+
+		
+
+	<div class="bottom-btn" style="max-width: 500px;">
+		<a class="default-btn btn-blue btn-a" id="add-token">添加通证</a>
+	</div>
+
+	</div>
+	<script src="../../js/mui.min.js"></script>
+    <script src="../../js/h.min.js"></script>
+    <script src="../../js/vue.js"></script>
+	<script src="../../js/app.js"></script>
+	<script type="text/javascript" charset="utf-8">
+
+        //获取地址
+        var get_address = GetQueryString('address');
+
+		h('#add-token').tap(function(){
+
+           	var  token_address = h("#token_address").val();
+
+            if(token_address.substr(0, 2) != "0x" || token_address.length!=42){
+                mui.toast('请输入正确的通证token');
+                return false;
+            }
+
+            if(localStorage.getItem('token_address')==null){
+
+                var obj = {};
+
+                obj[token_address]="1";
+
+            }else{
+                var obj = JSON.parse(localStorage.getItem('token_address'));
+
+                if(obj[token_address]!=undefined){
+
+                    mui.toast('通证token已存在');
+                    return false;
+                }
+                obj[token_address]="1";
+            }
+
+            localStorage.setItem('token_address',JSON.stringify(obj));
+            mui.toast('添加成功');
+            setTimeout(function(){
+                mui.openWindow({
+                    id: 'account.html',
+                    url: 'account.html?address='+get_address,
+                    show: {
+                        autoShow:true,
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+
+			},1000)
+        })
+	</script>
+</body>
+</html>

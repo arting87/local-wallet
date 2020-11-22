@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>QKI钱包-通证转出</title>
+    <link href="../../css/mui.min.css" rel="stylesheet"/>
+    <link href="../../css/app.css" rel="stylesheet"/>
+    <link href="../../fonts/iconfont.css" rel="stylesheet"/>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav app-header-2" id="header">
+		<a class="mui-action-back mui-icon mui-pull-left icon iconfont icon-back"></a>
+		<h1 class="mui-title">通证转出</h1>
+	</header>
+	
+	<div class="mui-content" id="content" v-cloak>
+		<div class="input-div bb">
+			<p class="p-for-input">账户地址</p>
+			<div class="mui-input-row">
+				<input type="text" id="address" readonly>
+			</div>
+		</div>
+
+		<div class="balance-div bb">
+			<p class="p-for-input">可用余额</p>
+			<h3 class="balance-h">{{amount}}<span class="unit"> {{unit}}</span></h3>
+		</div>
+		
+		<div class="input-div bb">
+			<p class="p-for-input">转出地址</p>
+			<div class="mui-input-row">
+				<input type="text" placeholder="请输入地址" id="transfer_out_address">
+			</div>
+		</div>
+		
+		<div class="input-div bb">
+			<p class="p-for-input">转出数量({{unit}})<!-- <span class="tips-span">*1 QKI=100 cQKI 1 cQKI=100 mQKI</span> --></p>
+			<div class="mui-input-row">
+				<input type="text" class="export-input" placeholder="请输入数量" id="num">
+				<span class="export-all" id="export-all">全部转出</span>
+			</div>
+		</div>
+		
+		<div class="input-div bb">
+			<p class="p-for-input">账户密码</p>
+			<div class="mui-input-row mui-password">
+				<input type="password" class="mui-input-password" placeholder="请输入密码" id="password">
+			</div>
+		</div>
+        <span style="display: none" id="height-option">
+            <div class="input-div bb">
+                <p class="p-for-input">gas值</p>
+                <div class="mui-input-row mui-password">
+                    <input type="text" placeholder="请输入gas值" id="gas">
+                </div>
+            </div>
+            <div class="input-div bb">
+                <p class="p-for-input">gasPrice值<font color="red">(默认值为1)</font></p>
+                <div class="mui-input-row mui-password">
+                    <input type="text" placeholder="请输入gasPrice值" id="gasPrice">
+                </div>
+            </div>
+        </span>
+        <div>
+            <span class="height-option" onclick="showHeightOptions()">高级选项</span>
+        </div>
+		<span style="text-align: center;">
+			<div id="over" class="overLoading"></div>
+			<div id="layout" class="layoutLoading"><img src="../../images/loading.gif" /></div>
+		</span>
+
+	<div class="bottom-btn" style="max-width: 500px;">
+		<a class="default-btn btn-blue btn-a" id="show-popover">提交转账</a>
+	</div>
+
+	<!--弹窗 start-->
+	<div id="location-div"></div>
+	<div id="middlePopover" class="mui-popover" style="max-width: 500px;">
+		<div class="popover-box">
+			<div class="pop-title pop-line">提示</div>
+			<div class="pop-content pop-line" style="margin-top: -5px;">
+				本次转出<font color="red">预计</font>需要{{gasPrice}}QKI矿工费,确认转出？<br/>
+				转出需要十秒左右，请耐心等待！<br />
+			</div>
+			<div class="pop-btn-div">
+				<div class="pop-btn">
+					<button class="default-btn btn-default" id="cancel">取消</button>
+				</div>
+				<div class="pop-btn">
+					<button class="default-btn btn-pink" id="export-btn">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--弹窗 end-->
+	</div>
+
+	<script src="../../js/mui.min.js"></script>
+    <script src="../../js/h.min.js"></script>
+    <script src="../../js/vue.js"></script>
+    <script src="../../js/app.js"></script>
+    <script src="../../js/error.js"></script>
+    <script src="../../js/math.min.js"></script>
+    <script src="../../js/web3.min.js"></script>
+	<script src="../../js/ethers-v4.min.js" charset="utf-8"  type="text/javascript"></script>
+	<script type="text/javascript" charset="utf-8">
+        // 引入web3
+        var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+
+        //等待加载
+        showLoading();
+        function showLoading(show){
+            if(show){
+                document.getElementById("over").style.display = "block";
+                document.getElementById("layout").style.display = "block";
+            }else{
+                document.getElementById("over").style.display = "none";
+                document.getElementById("layout").style.display = "none";
+            }
+        }
+
+		mui.init();
+		vm = new Vue({
+			el: '#content',
+			data: {
+				amount:0,
+                gasPrice: 0,
+				unit: '',
+                transaction_count:0,
+			},
+		});
+
+		//获取地址
+		var my_address = GetQueryString('address');   //我的地址
+		var token_address = GetQueryString('token');  //合约地址
+        h("#address").val(my_address);
+		getTransactionCount(my_address);
+        updateAccount();
+        /**
+         * 请求当前账户的余额
+         */
+        function updateAccount()
+        {
+            createSmartContract(token_address, my_address);
+            var gas = 53324;
+            var gasPrice = math.multiply(gas, 0.00000001);
+            vm.gasPrice = gasPrice;
+        }
+
+		//全部转出
+		h("#export-all").tap(function(){
+            h("#num").val(vm.amount);
+		});
+
+			
+		var checkSubmitFlg = false;
+		h("#export-btn").tap(function(){
+			var amount = h("#num").val();
+			var transfer_out_address = h("#transfer_out_address").val();
+			var password = h("#password").val();
+            transfer_out_address = trim(transfer_out_address);
+			if(transfer_out_address == "")
+			{
+				mui.toast("请输入地址");
+				return false;
+			}
+			if(my_address == transfer_out_address)
+			{
+			    mui.toast("不能转给自己");
+			    return false;
+			}
+			if(!isNumber(amount))
+			{
+				mui.toast("请输入正确的数量");
+				return false;
+			}
+
+			if(amount <= 0)
+			{
+				mui.toast("请输入正确的数量");
+				return false;
+			}
+
+			if(password == "")
+			{
+                mui.toast("请输入密码");
+                return false;
+			}
+
+			//判断矿工费
+            rpc("eth_getBalance",[my_address, "latest"],function (data) {
+                var qki_amount =  web3.utils.hexToNumber(data.result);
+                var sub_amount = math.subtract(qki_amount, vm.gasPrice);
+                if(sub_amount < 0)
+                {
+                    mui.toast("剩余QKI不足以支付矿工费");
+                    return false;
+                }
+            });
+
+            if (checkSubmitFlg === true)
+            {
+                return false;
+            }
+            checkSubmitFlg = true;
+
+			mui('#middlePopover').popover('hide');
+			//账户解锁
+            rpc("personal_unlockAccount", [my_address, password, 2], function (data) {
+                //转账
+				if(data.result){
+                    amount = amount * math.pow(10,decimals);
+                    var num = amount.toString(16);
+                    num = '0x'+num;
+                    showLoading(true);
+                    sendTransaction(transfer_out_address, num);
+				}else{
+                    if(data.error.code == -32000)
+                    {
+                        mui.toast("密码错误");
+                    }else{
+                        mui.toast("网络异常");
+                    }
+                    setTimeout(function () {
+                        window.location.reload();
+                    },2000);
+				}
+            })
+
+		});
+
+		
+		//弹窗js
+		document.getElementById('show-popover').addEventListener('tap',function(){
+			mui('#middlePopover').popover('show',document.getElementById("location-div"));
+		});
+		document.getElementById('cancel').addEventListener('tap',function(){
+			mui('#middlePopover').popover('hide');
+		});
+
+        decimals = 0;
+
+        /**
+		 * 查询智能合约余额
+         * @param address 转出地址
+         */
+		function createSmartContract(token, address) {
+			// abi json 对象
+            const abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" } ];
+			// 创建一个连接主网络的 provider
+            const provider = new ethers.providers.JsonRpcProvider({"url":"http://localhost:8545"});
+			// 创建智能合约
+            const contract = new ethers.Contract(token, abi, provider);
+
+            decimals = 0;
+            contract.decimals().then(function(data){
+                decimals = data;
+                var balance =  0;
+                contract.balanceOf(address).then(function (data) {
+                    balance = math.divide(data.toString(), math.pow(10,decimals));
+                    vm.amount = balance;
+                })
+            })
+
+
+            contract.symbol().then(function (unit) {
+                vm.unit = unit;
+            })
+        }
+
+        //转账
+		function sendTransaction(to_address, amount) {
+            var gas = h("#gas").val();
+            var heightGasPrice = h("#gasPrice").val();
+
+            if(gas == "")
+            {
+                gas = 500000;
+            }
+
+            if(gas < 50000)
+            {
+                mui.toast("gas最小不能低于50000");
+                setTimeout(function () {
+                    window.location.reload();
+                },2000);
+                return false;
+            }else{
+                if(isNumbers(gas))
+                {
+                    mui.toast("gas只能输入数字");
+                    setTimeout(function () {
+                        window.location.reload();
+                    },2000);
+                    return false;
+                }
+			}
+
+            if(heightGasPrice == "")
+            {
+                heightGasPrice = web3.utils.toWei('1', 'gwei');
+            }else{
+                if(isNumbers(heightGasPrice))
+				{
+                    mui.toast("gasPrice只能输入数字");
+                    setTimeout(function () {
+                        window.location.reload();
+                    },2000);
+                    return false;
+				}else{
+                    heightGasPrice = web3.utils.toWei(heightGasPrice, 'gwei');
+				}
+
+            }
+
+			// 定义合约abi
+            var contractAbi = [{ "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }];
+
+			// 合约地址
+            var contractAddress = token_address;
+
+			// 账号
+            var currentAccount = my_address;
+
+			// 定义合约
+            var myContract = new web3.eth.Contract(contractAbi, contractAddress, {
+                from: currentAccount, // default from address
+				gas:gas,
+                gasPrice: heightGasPrice // default gas price in wei, 10 gwei in this case
+            });
+
+            // 代币转账
+            myContract.methods.transfer(to_address, amount).send({
+				from: currentAccount,
+				nonce:web3.utils.toHex(vm.transaction_count)}
+			).then(function (data) {
+				if(data.status === true)
+				{
+				    mui.toast('操作成功');
+                    setTimeout(function () {
+                        window.location.reload();
+                    },2000);
+				}else{
+				    mui.toast('网络异常');
+				}
+            }).catch(function(error) {
+                if(error !== "" || error !== null)
+				{
+                    mui.toast('参数异常');
+                    // setTimeout(function () {
+                    //     window.location.reload();
+                    // },2000);
+				}
+			});
+
+		}
+
+		//获取地址交易数量
+		function getTransactionCount(my_address)
+		{
+            web3.eth.getTransactionCount(my_address).then(function (data) {
+				vm.transaction_count = data;
+            })
+		}
+	</script>
+</body>
+</html>

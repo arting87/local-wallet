@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-title" content="QKI钱包">
+	<link rel="apple-touch-icon" href="../unpackage/res/icons/192x192.png">
+	<title>QKI钱包</title>
+	<link href="../css/mui.min.css" rel="stylesheet"/>
+	<link href="../css/app.css?v=1" rel="stylesheet"/>
+	<link href="../fonts/iconfont.css" rel="stylesheet"/>
+	<style type="text/css">
+		.app-header-1 .mui-title{
+			left: 1.5rem;
+			text-align: left;
+		}
+		.app-header-1 .mui-icon, .app-header-2 .mui-title{
+			color: #6149fc;
+			font-weight: 600;
+			font-size:2rem;
+		}
+	</style>
+</head>
+<body>
+<header class="mui-bar mui-bar-nav app-header-1" id="header">
+	<!-- <a class="mui-icon mui-pull-left icon iconfont icon-scan" id="scan-btn"></a> -->
+	<h1 class="mui-title">
+		<img src="../images/logo.png" alt="">
+	</h1>
+	<a class="mui-icon mui-pull-right " id="setting-btn">区块浏览器</a>
+</header>
+
+<div class="mui-content " id="content" v-cloak>
+	<div id="demo1" class="mui-progressbar" >
+		<span></span>
+	</div>
+	
+	<div >
+		<div class="balance-box shadow">
+			<div class="balance">
+				<p class="title">
+					账户余额
+				</p>
+				<p class="value">
+					{{ amount }} QKI
+				</p>
+
+			</div>
+			<div class="add-account" id="add-account-btn">
+					<span>
+						<img src="../images/add-account.png" alt="">
+					</span>
+				<span>
+						创建账户
+					</span>
+			</div>
+		</div>
+		<div class="index-no-data" v-if="accountList.length<=0">
+			<img src="../images/add-account-ico.png" alt="">
+			<p>暂无账户</p>
+		</div>
+		<div class="account-list"  v-if="accountList.length>0">
+			<div class="account-list-title">
+					<span>
+						<img src="../images/account-list-title.png" alt="">
+					</span>
+				<span>
+						账户总览
+					</span>
+			</div>
+			<div class="item shadow" v-on:tap="tapAccount(account)" v-for="(account, key, index) in accountList">
+				<div class="inner shadow">
+
+					<div class="account-info">
+
+						<div class="balance-address">
+							<p class="account-balance">
+									<span class="mui-pull-left title">
+										昵称
+									</span>
+								<span class="mui-pull-right value">
+										<strong>{{wallet_name[account]}}</strong>
+									</span>
+							</p>
+							<p class="account-balance">
+									<span class="mui-pull-left title">
+										余额
+									</span>
+								<span class="mui-pull-right value">
+										<strong>{{accountAmount[key]}}</strong>QKI
+									</span>
+							</p>
+							<p class="address">
+									<span class="mui-pull-left title">
+										地址
+									</span>
+								<span class="mui-pull-right value">
+										 {{account}}
+									</span>
+							</p>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		<!--弹窗 start-->
+		<div id="location-div"></div>
+	</div>
+
+</div>
+
+
+
+<!--升级弹窗-->
+<div id="add-account-popover" class="mui-popover add-account-popover">
+	<div class="popover-box">
+		<div class="title">
+			<img src="../images/add-account-ico.png" alt="">
+			<p>创建账户</p>
+		</div>
+		<div class="pop-upgrate-content">
+			<input type="text" name="name" id="name" placeholder="请输入昵称">
+		</div>
+		<div class="pop-upgrate-content">
+			<input type="password" name="password" id="password" placeholder="请输入密码">
+		</div>
+		<p style="float: left; padding-left: 40px; padding-top: 10px;">
+			1.设置本地钱包密码，和在线钱包无关。<br />
+			2.你设置的密码没有任何人知道，也没有任何人保存。<br/>
+			3.请记住这个密码，如果忘记，里面的资产都会遗失。
+		</p>
+		<div class="pop-upgrate-btn">
+			<button class="default-btn btn-purple" data-loading-text="添加中..." data-loading-icon id="add-account-submit">创建账户</button>
+		</div>
+		<img id="cancel" class="close-popover-img close-add-power-pop" src="../images/close-popover.png" />
+	</div>
+</div>
+
+<script src="../js/mui.min.js"></script>
+<script src="../js/immersed.js"></script>
+<script src="../js/h.min.js"></script>
+<script src="../js/app.js?v=3"></script>
+<script src="../js/vue.js"></script>
+<script src="../js/error.js"></script>
+<script src="../js/vue-countup.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+
+    setInterval(function(){
+        getNetworkStatus();
+    },1000);
+    //获取网络状态
+	var set = 0;
+    function getNetworkStatus() {
+        rpc("eth_syncing", [],function (data) {
+            if(data.result !== false){
+                mui.toast('正在同步区块，请稍后');
+                mui("#demo1").progressbar({progress:set}).show();
+                var currentBlock = parseInt(data.result.currentBlock,16);
+                var highestBlock = parseInt(data.result.highestBlock,16);
+                var block = currentBlock/highestBlock;
+                set = block.toFixed(2)*100;
+                mui("#demo1").progressbar().setProgress(set);
+            }else{
+                mui("#demo1").progressbar().hide();
+			}
+        })
+    }
+    vm = new Vue({
+        el: '#content',
+        data: {
+            accountList:[],
+            accountAmount:0,
+            amount:0,
+            wallet_name:null
+        },
+        methods: {
+            tapAccount: function (address) {
+
+                localStorage.setItem("address",address);
+
+                mui.openWindow({
+                    url:"account/account.html?address="+address,
+                    id:"account.html",
+                    show:{
+                        autoShow:true,//页面loaded事件发生后自动显示，默认为true
+                    },
+                    waiting: {
+                        autoShow: false
+                    }
+                });
+            }
+        }
+    });
+
+    h("#setting-btn").tap(function(){
+
+        mui.openWindow({
+            id: 'index.html',
+            url: './block_browser/index.html',
+            show: {
+                autoShow:true,
+            },
+            waiting: {
+                autoShow: false
+            }
+        });
+
+    });
+
+    //弹窗js
+    document.getElementById('add-account-btn').addEventListener('tap',function(){
+        mui('#add-account-popover').popover('show',document.getElementById("location-div"));
+    });
+    document.getElementById('cancel').addEventListener('tap',function(){
+        mui('#add-account-popover').popover('hide');
+    });
+
+
+    h("#add-account-submit").tap(function(){
+        addAccount();
+    });
+    setInterval(function(){
+        getAccounts();
+    },5000);
+
+    getAccounts();
+    //获取我的账户
+    function getAccounts(){
+
+        vm.accountList = [];
+        vm.accountAmount = [];
+        vm.amount = 0;
+
+        var wallet_name = localStorage.getItem("wallet_name");
+        vm.wallet_name = JSON.parse(wallet_name);
+        if(vm.wallet_name==null){
+            vm.wallet_name={};
+		}
+        rpc("eth_accounts",[],function (data) {
+            if(data.result.length>0){
+
+                for(var i=0;data.result.length>i;i++){
+
+                    rpc("eth_getBalance",[data.result[i],"latest"],function (amount){
+
+                        var addressAmount = parseInt(amount.result,16);
+                        if(addressAmount>0){
+                            addressAmount = addressAmount/1000000000000000000;
+						}
+                        vm.accountAmount.push(addressAmount);
+						vm.amount += addressAmount;
+                    })
+
+				}
+
+				vm.accountList = data.result;
+
+			}
+
+        });
+
+    }
+    var checkSubmitFlg = false;
+
+    /**
+     * 添加账户
+     */
+    function addAccount()
+    {
+
+        if (checkSubmitFlg)
+        {
+            return false;
+        }
+        mui("#add-account-submit").button('loading');
+        checkSubmitFlg = true;
+        var password = h("#password").val();
+        var name = h("#name").val();
+        if(!name){
+            mui.toast('昵称不能为空');
+            return false;
+		}
+
+        rpc("personal_newAccount",[password],"",name);
+
+        getAccounts();
+
+        mui.toast('创建成功');
+        checkSubmitFlg = false;
+        h("#password").val("");
+        mui("#add-account-submit").button('reset');
+        mui('#add-account-popover').popover('hide');
+
+    }
+
+    sw_version = "V5";
+    update_sw(sw_version);
+
+</script>
+</body>
+</html>
