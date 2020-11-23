@@ -189,7 +189,7 @@
 			var btnArray = ['取消', '解锁'];
 			mui.prompt('请输入密码,解锁钱包30秒，请勿在不安全的环境解锁','输入密码',"解锁钱包",btnArray,function(e){
 				if(e.index == 1){
-					rpc("personal_unlockAccount", [address, e.value, 30],function () {
+					rpc("personal_unlockAccount", [address, e.value, 30],function (data) {
 						if(data.result)
 						{
 							mui.toast("解锁成功");
