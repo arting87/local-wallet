@@ -103,7 +103,7 @@
     <script src="../../js/error.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjs@8.0.1/lib/browser/math.min.js"></script>
     <script src="../../js/web3.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/ethers@4.0.48/dist/ethers.min.js" integrity="sha256-G6dbraKIWJ+XKEIOascshiGg4W/IQZj1M9MThYft/K8=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/ethers@5.0.22/dist/ethers.umd.min.js" integrity="sha256-KYggVWsVPz/C6nEzJzFpCaL3/WHSIRyVcffGL2V8o8s=" crossorigin="anonymous"></script>
 	<script type="text/javascript" charset="utf-8">
         // 引入web3
         var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
@@ -207,9 +207,9 @@
 
 			mui('#middlePopover').popover('hide');
 			//账户解锁
-            rpc("personal_unlockAccount", [my_address, password, 2], function (data) {
+            // rpc("personal_unlockAccount", [my_address, password, 2], function (data) {
                 //转账
-				if(data.result){
+				if(true){
                     amount = amount * math.pow(10,decimals);
                     var num = amount.toString(16);
                     num = '0x'+num;
@@ -226,7 +226,7 @@
                         window.location.reload();
                     },2000);
 				}
-            })
+            // })
 
 		});
 
