@@ -54,6 +54,16 @@
 				<img src="../../images/export-ico.png" alt="">
 				<div class="mui-media-body">解锁钱包</div>
 			</li>
+
+			<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="qki2wqki-btn">
+				<img src="../../images/export-ico.png" alt="">
+				<div class="mui-media-body">qki转wqki</div>
+			</li>
+
+			<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="wqki2qki-btn">
+				<img src="../../images/export-ico.png" alt="">
+				<div class="mui-media-body">wqki转qki</div>
+			</li>
 		</ul>
 		<div class="balance-div bb" v-for="(item, key) in token" style="overflow: hidden">
 			<p class="p-for-input" v-on:tap="open_pass(key)">通证：{{key}}</p>
@@ -201,7 +211,37 @@
                     autoShow: false
                 }
             });
-        });
+		});
+		
+		
+        //qki qki2wqki
+        h("#qki2wqki-btn").tap(function(){
+            mui.openWindow({
+                id: 'qki2wqki.html',
+                url: 'qki2wqki.html?address='+address,
+                show: {
+                    autoShow:true,
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+		});
+		
+        //qki wqki2qki
+        h("#wqki2qki-btn").tap(function(){
+            mui.openWindow({
+                id: 'wqki2qki.html',
+                url: 'wqki2qki.html?address='+address,
+                show: {
+                    autoShow:true,
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+		});
+		
         //qki
         h("#unlock-btn").tap(function(){
 			var btnArray = ['取消', '解锁'];

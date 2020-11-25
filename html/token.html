@@ -193,13 +193,28 @@
 
                     // 创建一个连接主网络的 provider
                     const provider = new ethers.providers.JsonRpcProvider({ "url": "http://localhost:8545" });
-                    let factory = new ethers.ContractFactory(new_abi, bytecode, provider.getSigner());
+                    const token = "0x835F6dF988B6f51c9477D49e96aDBbc644ba97a2"
+                    const provider = new ethers.providers.JsonRpcProvider({ "url": "http://localhost:8545" });
+                    var factory = null;
+                    provider.listAccounts().then(function (data) {
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].toLowerCase() == get_address) {
+        
+                                factory = new ethers.ContractFactory(new_abi, bytecode, provider.getSigner(i));
+                                return;
+                            }
+                        }
+                        contract = new ethers.Contract(token, abi, provider.getSigner());
+                    }, function (obj) {
+                        console.log(data)
+                    });
 
 
                     //部署
                     factory.deploy(token_amount, token_name, token_decimals, token_symbol, {
+						from:get_address,
                         gasLimit: 1000000,
-                        gasPrice: ethers.utils.parseUnits("100", "gwei")
+                        gasPrice: ethers.utils.parseUnits("1000", "gwei")
                     }).then(function (data) {
                         console.log(data)
 
