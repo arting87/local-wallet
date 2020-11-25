@@ -333,6 +333,7 @@
             // 代币转账
             myContract.methods.transfer(to_address, amount).send({
 				from: currentAccount
+            }
 			).then(function (data) {
 				if(data.status === true)
 				{
