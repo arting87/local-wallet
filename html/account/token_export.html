@@ -332,8 +332,7 @@
 
             // 代币转账
             myContract.methods.transfer(to_address, amount).send({
-				from: currentAccount,
-				nonce:web3.utils.toHex(vm.transaction_count)}
+				from: currentAccount
 			).then(function (data) {
 				if(data.status === true)
 				{
