@@ -134,7 +134,16 @@
 		//获取地址
 		var my_address = GetQueryString('address');   //我的地址
 		var token_address = GetQueryString('token');  //合约地址
-        h("#address").val(my_address);
+
+		var contract = null;
+		var signer_index = -1;
+		// abi json 对象
+		const abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" } ];
+		// 创建一个连接主网络的 provider
+		const provider = new ethers.providers.JsonRpcProvider({"url":"http://localhost:8545"});
+
+
+		h("#address").val(my_address);
         updateAccount();
         /**
          * 请求当前账户的余额
@@ -240,48 +249,53 @@
 
         decimals = 0;
 
-        /**
+		/**
 		 * 查询智能合约余额
          * @param address 转出地址
          */
 		function createSmartContract(address) {
-			// abi json 对象
-            const abi = [ { "constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "symbol", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "decimals", "outputs": [ { "name": "", "type": "uint8" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "totalSupply", "outputs": [ { "name": "", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" } ], "name": "balanceOf", "outputs": [ { "name": "balance", "type": "uint256" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transfer", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_from", "type": "address" }, { "name": "_to", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" } ], "name": "approve", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [ { "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" } ], "name": "allowance", "outputs": [ { "name": "remaining", "type": "uint256" } ], "payable": false, "type": "function" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_from", "type": "address" }, { "indexed": true, "name": "_to", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "name": "_owner", "type": "address" }, { "indexed": true, "name": "_spender", "type": "address" }, { "indexed": false, "name": "_value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "inputs": [ { "name": "_initialAmount", "type": "uint256" }, { "name": "_tokenName", "type": "string" }, { "name": "_decimalUnits", "type": "uint8" }, { "name": "_tokenSymbol", "type": "string" } ], "payable": false, "type": "constructor" }, { "constant": false, "inputs": [ { "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }, { "name": "_extraData", "type": "bytes" } ], "name": "approveAndCall", "outputs": [ { "name": "success", "type": "bool" } ], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "version", "outputs": [ { "name": "", "type": "string" } ], "payable": false, "type": "function" } ];
-			// 创建一个连接主网络的 provider
-            const provider = new ethers.providers.JsonRpcProvider({"url":"http://localhost:8545"});
-            var contract = null;
-            provider.listAccounts().then(function (data) {
-                for (let i = 0; i < data.length; i++) {
-                    if (data[i].toLowerCase() == my_address) {
-                        contract = new ethers.Contract(token_address, abi, provider.getSigner(i));
-                        console.log(i)
-                        updateAccount();
-                        return;
-                    }
-                }
+            if(signer_index < 0)
+			{
+				provider.listAccounts().then(function (data) {
+					for (let i = 0; i < data.length; i++) {
+						if (data[i].toLowerCase() == my_address) {
+							contract = new ethers.Contract(token_address, abi, provider.getSigner(i));
+							signer_index = i;
+							get_token_balance();
+							return;
+						}
+					}
 
-                contract = new ethers.Contract(token_address, abi, provider.getSigner());
+					contract = new ethers.Contract(token_address, abi, provider.getSigner());
+					get_token_balance();
+				}, function (obj) {
+					console.log(data)
+				});
+			}
+            else {
+				contract = new ethers.Contract(token_address, abi, provider.getSigner(signer_index));
+				get_token_balance();
 
-                updateAccount();
-            }, function (obj) {
-                console.log(data)
-            });
+			}
 
-            decimals = 0;
-            contract.decimals().then(function(data){
-                decimals = data;
-                var balance =  0;
-                contract.balanceOf(address).then(function (data) {
-                    balance = math.divide(data.toString(), math.pow(10,decimals));
-                    vm.amount = balance;
-                })
-            })
-
-
-            contract.symbol().then(function (unit) {
-                vm.unit = unit;
-            })
         }
+
+        function get_token_balance() {
+			decimals = 0;
+			contract.decimals().then(function(data){
+				decimals = data;
+				var balance =  0;
+				contract.balanceOf(my_address).then(function (data) {
+					balance = math.divide(data.toString(), math.pow(10,decimals));
+					vm.amount = balance;
+				})
+			});
+
+
+			contract.symbol().then(function (unit) {
+				vm.unit = unit;
+			})
+		}
 
         //转账
 		function sendTransaction(to_address, amount) {
