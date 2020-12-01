@@ -135,7 +135,6 @@
 		var my_address = GetQueryString('address');   //我的地址
 		var token_address = GetQueryString('token');  //合约地址
         h("#address").val(my_address);
-		getTransactionCount(my_address);
         updateAccount();
         /**
          * 请求当前账户的余额
@@ -253,7 +252,7 @@
             var contract = null;
             provider.listAccounts().then(function (data) {
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i].toLowerCase() == get_address) {
+                    if (data[i].toLowerCase() == my_address) {
                         contract = new ethers.Contract(token_address, abi, provider.getSigner(i));
                         console.log(i)
                         updateAccount();
@@ -369,14 +368,6 @@
 				}
 			});
 
-		}
-
-		//获取地址交易数量
-		function getTransactionCount(my_address)
-		{
-            web3.eth.getTransactionCount(my_address).then(function (data) {
-				vm.transaction_count = data;
-            })
 		}
 	</script>
 </body>
