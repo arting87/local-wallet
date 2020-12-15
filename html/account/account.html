@@ -64,6 +64,11 @@
 				<img src="../../images/export-ico.png" alt="">
 				<div class="mui-media-body">wqki转qki</div>
 			</li>
+
+			<li class="mui-table-view-cell mui-media mui-col-xs-4 mui-col-sm-3" id="bt-btn">
+				<img src="../../images/export-ico.png" alt="">
+				<div class="mui-media-body">燃烧bt</div>
+			</li>
 		</ul>
 		<div class="balance-div bb" v-for="(item, key) in token" style="overflow: hidden">
 			<p class="p-for-input" v-on:tap="open_pass(key)">通证：{{key}}</p>
@@ -233,6 +238,20 @@
             mui.openWindow({
                 id: 'wqki2qki.html',
                 url: 'wqki2qki.html?address='+address,
+                show: {
+                    autoShow:true,
+                },
+                waiting: {
+                    autoShow: false
+                }
+            });
+		});
+		
+        //qki wqki2qki
+        h("#bt-btn").tap(function(){
+            mui.openWindow({
+                id: 'bt.html',
+                url: 'bt.html?address='+address,
                 show: {
                     autoShow:true,
                 },
